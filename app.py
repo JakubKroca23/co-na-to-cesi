@@ -3,15 +3,11 @@ import openai
 import json
 import time
 
-# Konfigurace stránky
-
 st.set_page_config(
 page_title=“Co na to Cesi”,
 page_icon=“🎯”,
 layout=“wide”
 )
-
-# CSS pro tmavě modré téma a profesionální design
 
 st.markdown(”””
 
@@ -134,8 +130,6 @@ st.markdown(”””
 
 “””, unsafe_allow_html=True)
 
-# Inicializace session state
-
 if ‘answers’ not in st.session_state:
 st.session_state.answers = []
 if ‘revealed’ not in st.session_state:
@@ -144,9 +138,7 @@ if ‘question’ not in st.session_state:
 st.session_state.question = “”
 
 def get_survey_results(question):
-“”“Zavola OpenAI API pro ziskani vysledku pruzkumu”””
 try:
-# Nacteni API klice ze secrets
 api_key = st.secrets[“OPENAI_API_KEY”]
 client = openai.OpenAI(api_key=api_key)
 
@@ -179,11 +171,8 @@ Pravidla:
     )
     
     result_text = response.choices[0].message.content.strip()
-    
-    # Pokus se parsovat JSON
     answers = json.loads(result_text)
     
-    # Validace formatu
     if not isinstance(answers, list) or len(answers) != 5:
         raise ValueError("Nespravny format odpovedi")
         
@@ -199,15 +188,10 @@ Pravidla:
   return None
 
 def reveal_answer(index):
-“”“Odkryje odpoved na danem indexu”””
 st.session_state.revealed[index] = True
-
-# Hlavni nadpis
 
 st.markdown(’<h1 class="main-title">🎯 CO NA TO CESI</h1>’, unsafe_allow_html=True)
 st.markdown(’<p class="subtitle">Hadej 5 nejcastejsich odpovedi z pruzkumu mezi 100 Cechy!</p>’, unsafe_allow_html=True)
-
-# Input pro otazku
 
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
@@ -233,14 +217,11 @@ if st.button("🚀 Spustit pruzkum", use_container_width=True):
         st.warning("Prosim zadej otazku!")
 ```
 
-# Zobrazeni otazky a odpovedi
-
 if st.session_state.answers:
 st.markdown(f’<div class="question-box"><p class="question-text">❓ {st.session_state.question}</p></div>’,
 unsafe_allow_html=True)
 
 ```
-# Zobrazeni odpovedi
 for i, answer in enumerate(st.session_state.answers):
     if st.session_state.revealed[i]:
         st.markdown(f"""
@@ -259,7 +240,6 @@ for i, answer in enumerate(st.session_state.answers):
         </div>
         """, unsafe_allow_html=True)
 
-# Tlacitka pro odkryti
 st.markdown("---")
 cols = st.columns(5)
 for i in range(5):
@@ -271,7 +251,6 @@ for i in range(5):
         else:
             st.button(f"✓ Odkryto", key=f"revealed_{i}", disabled=True, use_container_width=True)
 
-# Tlacitko pro odkryti vsech
 st.markdown("---")
 col1, col2, col3 = st.columns([1, 1, 1])
 with col2:
@@ -284,8 +263,6 @@ with col2:
 
 else:
 st.info(“👆 Zadej otazku a spust pruzkum!”)
-
-# Footer
 
 st.markdown(”—”)
 st.markdown(
