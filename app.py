@@ -6,7 +6,7 @@ import time
 # Konfigurace stránky
 
 st.set_page_config(
-page_title=“Co na to Češi”,
+page_title=“Co na to Cesi”,
 page_icon=“🎯”,
 layout=“wide”
 )
@@ -144,34 +144,34 @@ if ‘question’ not in st.session_state:
 st.session_state.question = “”
 
 def get_survey_results(question):
-“”“Zavolá OpenAI API pro získání výsledků průzkumu”””
+“”“Zavola OpenAI API pro ziskani vysledku pruzkumu”””
 try:
-# Načtení API klíče ze secrets
+# Nacteni API klice ze secrets
 api_key = st.secrets[“OPENAI_API_KEY”]
 client = openai.OpenAI(api_key=api_key)
 
 ```
-    prompt = f"""Simuluj průzkum mezi 100 Čechy na otázku: "{question}"
+    prompt = f"""Simuluj pruzkum mezi 100 Cechy na otazku: "{question}"
 ```
 
-Vrať STRIKTNĚ POUZE VALIDNÍ JSON pole s 5 nejčastějšími lidovými odpověďmi.
-Formát: [
-{{“odpoved”: “text odpovědi”, “body”: číslo}},
+Vrat STRIKTNE POUZE VALIDNI JSON pole s 5 nejcastejsimi lidovymi odpovedmi.
+Format: [
+{{“odpoved”: “text odpovedi”, “body”: cislo}},
 …
 ]
 
 Pravidla:
 
-- Odpovědi musí být typicky české, lidové, vtipné ale realistické
-- Body reprezentují počet lidí (celkem 100)
-- Seřaď od nejvyšších bodů
-- Žádný další text, jen JSON pole”””
+- Odpovedi musi byt typicky ceske, lidove, vtipne ale realisticke
+- Body reprezentuji pocet lidi (celkem 100)
+- Serad od nejvyssich bodu
+- Zadny dalsi text, jen JSON pole”””
   
   ```
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
-            {"role": "system", "content": "Jsi expert na české průzkumy veřejného mínění. Vrať pouze validní JSON."},
+            {"role": "system", "content": "Jsi expert na ceske pruzkumy verejneho mineni. Vrat pouze validni JSON."},
             {"role": "user", "content": prompt}
         ],
         temperature=0.8,
@@ -183,44 +183,44 @@ Pravidla:
     # Pokus se parsovat JSON
     answers = json.loads(result_text)
     
-    # Validace formátu
+    # Validace formatu
     if not isinstance(answers, list) or len(answers) != 5:
-        raise ValueError("Nesprávný formát odpovědi")
+        raise ValueError("Nespravny format odpovedi")
         
     for answer in answers:
         if not isinstance(answer, dict) or 'odpoved' not in answer or 'body' not in answer:
-            raise ValueError("Nesprávná struktura odpovědi")
+            raise ValueError("Nespravna struktura odpovedi")
     
     return answers
   ```
   
   except Exception as e:
-  st.error(f”Chyba při komunikaci s API: {str(e)}”)
+  st.error(f”Chyba pri komunikaci s API: {str(e)}”)
   return None
 
 def reveal_answer(index):
-“”“Odkryje odpověď na daném indexu”””
+“”“Odkryje odpoved na danem indexu”””
 st.session_state.revealed[index] = True
 
-# Hlavní nadpis
+# Hlavni nadpis
 
-st.markdown(’<h1 class="main-title">🎯 CO NA TO ČEŠI</h1>’, unsafe_allow_html=True)
-st.markdown(’<p class="subtitle">Hádej 5 nejčastějších odpovědí z průzkumu mezi 100 Čechy!</p>’, unsafe_allow_html=True)
+st.markdown(’<h1 class="main-title">🎯 CO NA TO CESI</h1>’, unsafe_allow_html=True)
+st.markdown(’<p class="subtitle">Hadej 5 nejcastejsich odpovedi z pruzkumu mezi 100 Cechy!</p>’, unsafe_allow_html=True)
 
-# Input pro otázku
+# Input pro otazku
 
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
 question_input = st.text_input(
-“Zadej otázku pro průzkum:”,
-placeholder=“Např: Co Češi nejraději dělají o víkendu?”,
+“Zadej otazku pro pruzkum:”,
+placeholder=“Napr: Co Cesi nejradeji delaji o vikendu?”,
 label_visibility=“collapsed”
 )
 
 ```
-if st.button("🚀 Spustit průzkum", use_container_width=True):
+if st.button("🚀 Spustit pruzkum", use_container_width=True):
     if question_input.strip():
-        with st.spinner("🔍 Ptáme se 100 Čechů..."):
+        with st.spinner("🔍 Ptame se 100 Cechu..."):
             results = get_survey_results(question_input)
             if results:
                 st.session_state.answers = results
@@ -230,60 +230,60 @@ if st.button("🚀 Spustit průzkum", use_container_width=True):
                 time.sleep(0.5)
                 st.rerun()
     else:
-        st.warning("Prosím zadej otázku!")
+        st.warning("Prosim zadej otazku!")
 ```
 
-# Zobrazení otázky a odpovědí
+# Zobrazeni otazky a odpovedi
 
 if st.session_state.answers:
 st.markdown(f’<div class="question-box"><p class="question-text">❓ {st.session_state.question}</p></div>’,
 unsafe_allow_html=True)
 
 ```
-# Zobrazení odpovědí
+# Zobrazeni odpovedi
 for i, answer in enumerate(st.session_state.answers):
     if st.session_state.revealed[i]:
         st.markdown(f"""
         <div class="answer-box">
             <span class="answer-number">{i+1}</span>
             <span class="answer-text">{answer['odpoved']}</span>
-            <span class="answer-points">{answer['body']} bodů</span>
+            <span class="answer-points">{answer['body']} bodu</span>
         </div>
         """, unsafe_allow_html=True)
     else:
         st.markdown(f"""
         <div class="answer-box hidden">
             <span class="answer-number">{i+1}</span>
-            <span class="answer-text">Skrytá odpověď</span>
+            <span class="answer-text">Skryta odpoved</span>
             <span class="answer-points">?</span>
         </div>
         """, unsafe_allow_html=True)
 
-# Tlačítka pro odkrytí
+# Tlacitka pro odkryti
 st.markdown("---")
 cols = st.columns(5)
 for i in range(5):
     with cols[i]:
         if not st.session_state.revealed[i]:
-            if st.button(f"Odkrýt #{i+1}", key=f"reveal_{i}", use_container_width=True):
+            if st.button(f"Odkryt #{i+1}", key=f"reveal_{i}", use_container_width=True):
                 reveal_answer(i)
                 st.rerun()
         else:
             st.button(f"✓ Odkryto", key=f"revealed_{i}", disabled=True, use_container_width=True)
 
-# Tlačítko pro odkrytí všech
+# Tlacitko pro odkryti vsech
 st.markdown("---")
 col1, col2, col3 = st.columns([1, 1, 1])
 with col2:
     if not all(st.session_state.revealed):
-        if st.button("🎉 Odkrýt vše", use_container_width=True):
+        if st.button("🎉 Odkryt vse", use_container_width=True):
             st.session_state.revealed = [True] * 5
             st.balloons()
             st.rerun()
 ```
 
 else:
-st.info(“👆 Zadej otázku a spusť průzkum!”)
+st.info(“👆 Zadej otazku a spust pruzkum!”)
 
 # Footer
 
